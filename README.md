@@ -15,3 +15,5 @@ API homework. Task 2 in TypeScript
 3. create file keys.ts in ./src and add const API_KEY with your own API Key of exchangeratesapi.io;
 4. npm run build
 5. npm start
+
+You can choose the exchange rate of any other currencies by simply making changes the `currencies` array.
