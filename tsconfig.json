@@ -6,7 +6,7 @@
         "outDir": "./dist",
         "sourceMap": true,
         "esModuleInterop": true,
-        "lib": ["es2015", "dom"],
+        "lib": ["es2017", "dom"],
         "rootDir": "./src"
     }
 }
