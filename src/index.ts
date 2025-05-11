@@ -40,39 +40,41 @@ function createTable() {
 }
 
 function getCurrencyName() {
-    return fetch(`https://api.exchangeratesapi.io/v1/symbols?access_key=${API_KEY}`);
-}
-
-function fillTheTable() {
-    getCurrencyName()
-        .then((response) => response.json())
-        .then(({ symbols }) => {
-            const tableData: TableData = {};
-
-            for (const symbol of currencies) {
-                tableData[symbol] = symbols[symbol];
-            }
-
-            renewDataTable('currency', tableData);
-
-            setTimeout(() => {
-                getCurrencyRates()
-                    .then((response) => response.json())
-                    .then(({ base, rates }: ExchangeRateResponse) => {
-                        const appHeader = document.querySelector('.app-header');
-
-                        if (appHeader) {
-                            appHeader.textContent += `${base} exchange rate`;
-                        }
-
-                        renewDataTable('rate', rates);
-                    });
-            }, 1000);
+    return fetch(`https://api.exchangeratesapi.io/v1/symbols?access_key=${API_KEY}`)
+        .then((response) => {
+            return response.json();
         });
 }
 
+function fillTheTable() {
+    getCurrencyName().then(({ symbols }) => {
+        const tableData: TableData = {};
+
+        for (const symbol of currencies) {
+            tableData[symbol] = symbols[symbol];
+        }
+
+        renewDataTable('currency', tableData);
+
+        setTimeout(() => {
+            getCurrencyRates().then(({ base, rates }: ExchangeRateResponse) => {
+                const appHeader = document.querySelector('.app-header');
+
+                if (appHeader) {
+                    appHeader.textContent += `${base} exchange rate`;
+                }
+
+                renewDataTable('rate', rates);
+            });
+        }, 1000);
+    });
+}
+
 function getCurrencyRates() {
-    return fetch(`https://api.exchangeratesapi.io/v1/latest?access_key=${API_KEY}&symbols=${currencies.toString()}`);
+    return fetch(`https://api.exchangeratesapi.io/v1/latest?access_key=${API_KEY}&symbols=${currencies.toString()}`)
+        .then((response) => {
+            return response.json();
+        });
 }
 
 function renewDataTable(selector: string, data: ExchangeRates | TableData) {
@@ -90,16 +92,13 @@ function renewDataTable(selector: string, data: ExchangeRates | TableData) {
 }
 
 const tableDataRenewInterval = setInterval(() => {
-    getCurrencyRates()
-        .then((response) => response.json())
-        .then(({ rates }: ExchangeRateResponse) => {
-            const rateValues = Object.values(rates);
-            const compareResult = compareData(memoExchangeRate, rateValues);
-            if (!compareResult) {
-                console.log('renew');
-                renewDataTable('rate', rates);
-            }
-        });
+    getCurrencyRates().then(({ rates }: ExchangeRateResponse) => {
+        const rateValues = Object.values(rates);
+        const compareResult = compareData(memoExchangeRate, rateValues);
+        if (!compareResult) {
+            renewDataTable('rate', rates);
+        }
+    });
 }, 60000);
 
 function compareData(oldData: string[], newData: number[]) {
